@@ -18,6 +18,7 @@ class App extends Component {
   _isMounted = false;
 
   state = {
+    gameEnded: null,
     accounts: null,
     activeAccount: null,
     activeAccountBalance: -1,
@@ -78,56 +79,50 @@ class App extends Component {
         "Failed to load web3, accounts, or contract. Check console for details."
       );
     }
+
+    this.fetchDataPolling();
+  };
+
+  fetchDataPolling = () => {
+    // periodically check for changes of the data in the blockhain
+    setInterval(() => {
+      this.fetchData();
+    }, 2000);
   };
 
   /////////////////////////////////////////////////////////////////////////////
   // fetch data
   /////////////////////////////////////////////////////////////////////////////
-  fetchDataPolling = setInterval(() => {
-    this.fetchData();
-  }, 2000);
 
   fetchInitialData = async () => {
-    const { contract } = this.state;
-
-    // get minimum allowed number for tickets
-    const minNumber = await contract.methods.getMinNumber().call();
-    if (this._isMounted) {
-      this.setState({
-        minNumber: parseInt(minNumber, 10)
-      });
+    if (!this._isMounted) {
+        return;
     }
 
-    // get maximum allowed number for tickets
-    const maxNumber = await contract.methods.getMaxNumber().call();
-    if (this._isMounted) {
-      this.setState({
-        maxNumber: parseInt(maxNumber, 10)
-      });
-    }
+    this.setState({
+      gameEnded: await this.state.contract.methods.hasGameEnded().call(),
+      minNumber: parseInt(await this.state.contract.methods.getMinNumber().call(), 10),
+      maxNumber: parseInt(await this.state.contract.methods.getMaxNumber().call(), 10)
+    });
   };
 
   fetchData = async () => {
-    console.log("[HOME] fetchData");
+    if (!this._isMounted) {
+      return;
+    }
+
     const { contract, web3 } = this.state;
 
     // fetch accounts from metamask
     const accounts = await web3.eth.getAccounts();
-    if (this._isMounted) {
-      this.setState({ accounts: accounts });
-    }
-
-    // get active account
     const activeAccount = accounts[0];
-    if (this._isMounted) {
-      this.setState({ activeAccount: activeAccount });
-    }
 
-    // fetch balance of active account
-    const activeAccountBalance = await web3.eth.getBalance(activeAccount);
-    if (this._isMounted) {
-      this.setState({ activeAccountBalance: activeAccountBalance });
-    }
+    this.setState({
+      gameEnded: await contract.methods.hasGameEnded().call(),
+      accounts: accounts,
+      activeAccount: activeAccount,
+      activeAccountBalance: await web3.eth.getBalance(activeAccount)
+    });
 
     this.updateTickets(contract);
     this.updateJackpot(contract);
@@ -205,7 +200,9 @@ class App extends Component {
       return;
     }
 
-    await contract.methods.endGame().send({ from: accounts[0] });
+    await contract.methods
+      .endGame()
+      .send({ from: accounts[0] });
 
     this.fetchData();
   };
@@ -214,7 +211,9 @@ class App extends Component {
   skipBlockHandler = async () => {
     const { contract, accounts } = this.state;
 
-    await contract.methods.skipBlock().send({ from: accounts[0] });
+    await contract.methods
+      .skipBlock()
+      .send({ from: accounts[0] });
 
     this.fetchData();
   };
@@ -235,16 +234,14 @@ class App extends Component {
   };
 
   /////////////////////////////////////////////////////////////////////////////
-  // render component
+  // redner component
   /////////////////////////////////////////////////////////////////////////////
   render() {
     return (
       <div>
         {/* TODO: remove as soon as it is not needed anymore*/}
         <div style={{ textAlign: "center", margin: "1rem" }}>
-          <Button secondary onClick={this.skipBlockHandler}>
-            Skip Block
-          </Button>
+          <Button secondary onClick={this.skipBlockHandler}>Skip Block</Button>
         </div>
         <Wrapper>
           <Grid>
@@ -260,11 +257,7 @@ class App extends Component {
               <Grid.Column width={8}>
                 <div style={{ textAlign: "center", margin: "1rem" }}>
                   <Segment>
-                    Your account has{" "}
-                    <strong>
-                      {weiToEther(this.state.activeAccountBalance)}
-                    </strong>{" "}
-                    ETH
+                  Your account has <strong>{weiToEther(this.state.activeAccountBalance)}</strong>  ETH 
                   </Segment>
                 </div>
               </Grid.Column>
@@ -281,12 +274,15 @@ class App extends Component {
                       drawBlock={this.state.drawBlock}
                     />
                     <Game
+                      gameEnded={this.state.gameEnded}
                       minNumber={this.state.minNumber}
                       maxNumber={this.state.maxNumber}
                       buyTicket={this.buyTicketClickHandler}
                       endGame={this.endGameClickHandler}
                     />
-                    <Tickets tickets={this.state.tickets} />
+                    <Tickets
+                      tickets={this.state.tickets}
+                    />
                   </div>
                 ) : (
                   <Loading
