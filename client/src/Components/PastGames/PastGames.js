@@ -10,12 +10,15 @@ const pastGame = props => (
       <PastGame
         key={index}
         index={index}
-        luckyNumber={game.luckyNumber}
+        luckyNumbers={game.luckyNumbers}
         jackpot={game.jackpot}
         numberOfWinners={game.numberOfWinners}
         numberOfParticipants={game.numberOfParticipants}
+        nrOfPastGames={props.nrOfPastGames}
         endBlock={game.endBlock}
         drawBlock={game.drawBlock}
+        getParticipants={props.getParticipants}
+        getWinners={props.getWinners}
       />
     ))}
   </Card.Group>

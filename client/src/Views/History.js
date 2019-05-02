@@ -17,7 +17,7 @@ class History extends Component {
 
     displayedGames: [], // 0 -> first ever game played
     nrOfPastGames: 0, // nrOfPastGames -1 corresponds to the index of the most recent game
-    batchSize: 6, // how many games to display per 'page'
+    batchSize: 3, // how many games to display per 'page'
     activePage: 1,
     numberOfPages: 1
   };
@@ -93,6 +93,7 @@ class History extends Component {
     const displayedGames = [];
     for (head; head >= tail; head--) {
       const game = await contract.methods.finishedGames(head).call();
+      game.luckyNumbers = await contract.methods.getLuckyNumbers(head).call();
       displayedGames.push(game);
     }
 
@@ -115,6 +116,16 @@ class History extends Component {
     this.setState({ activePage: data.activePage });
     this.loadGamesOfCurrentPage(data.activePage);
   };
+
+  getParticipantsClickHandler = async (gameIndex) => {
+    const {contract} = this.state;
+    return await contract.methods.getParticipants(gameIndex).call();
+  }
+
+  getWinnersClickHandler = async (gameIndex) => {
+    const {contract} = this.state;
+    return await contract.methods.getWinners(gameIndex).call();
+  }
 
   /////////////////////////////////////////////////////////////////////////////
   // react life cycle hooks
@@ -151,6 +162,9 @@ class History extends Component {
               </div>
               <PastGames 
                 games={this.state.displayedGames}
+                nrOfPastGames={this.state.nrOfPastGames}
+                getParticipants={this.getParticipantsClickHandler}
+                getWinners={this.getWinnersClickHandler}
               />
             </Grid.Column>
           </Grid.Row>
