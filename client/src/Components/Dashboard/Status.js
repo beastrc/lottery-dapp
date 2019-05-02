@@ -1,28 +1,11 @@
-import React from "react";
+import React from 'react'
 
-import { Segment, Icon } from "semantic-ui-react";
+import {Segment} from 'semantic-ui-react';
 
-import "./Status.css";
-
-const statusStyle = {
-  textAlign: "right",
-  marginBottom: "1em"
-};
-
-const status = props => {
-  const ended = (
-    <div style={statusStyle}>
-      game finished <Icon color="red" name="circle" />
-    </div>
-  );
-
-  const running = (
-    <div style={statusStyle}>
-      game running <Icon className="pulsate-fwd" color="green" name="circle" />
-    </div>
-  );
-
-  return <div>{props.hasGameEnded ? ended : running}</div>;
-};
+const status = (props) => {
+  return (
+    <Segment>status</Segment>
+  )
+}
 
 export default status;
