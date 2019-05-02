@@ -12,12 +12,12 @@ class Tickets extends Component {
         <Card.Group>
         {
           this.props.tickets !== null ? 
-            this.props.tickets.map((ticketNumbers, index) => {
+            this.props.tickets.map((ticket, index) => {
               return (
                 <Ticket
                   key={index}
                   index={index + 1}
-                  numbers={ticketNumbers}
+                  number={ticket}
                 />
               )
             }) :

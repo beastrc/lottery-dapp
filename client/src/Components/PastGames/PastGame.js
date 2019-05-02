@@ -9,22 +9,16 @@ const pastGame = props => (
   <Card fluid>
     <Card.Content>
       <Card.Header>
-        {
-          props.luckyNumbers.map((number) => {
-            return (
-              <Label
-                circular
-                style={{
-                  backgroundColor: "rgb(93, 133, 164)",
-                  color: "white"
-                }}
-                size="huge"
-              >
-                {number}
-              </Label>
-            )
-          })
-        }
+        <Label
+          circular
+          style={{
+            backgroundColor: "rgb(93, 133, 164)",
+            color: "white"
+          }}
+          size="huge"
+        >
+          {props.luckyNumber}
+        </Label>
         <Statistic floated="right" size="tiny">
           <Statistic.Value>
             <Icon name="ethereum" /> {weiToEther(props.jackpot) || "0"}

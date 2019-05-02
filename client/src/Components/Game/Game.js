@@ -6,10 +6,9 @@ import { Segment, Header, Input, Button } from "semantic-ui-react";
 
 class Game extends Component {
   state = {
-    activeNumbers: []
+    pressedNumber: -1
   };
 
-  // TODO: is this one needed? 'handleChange' seems to never be called and 'this.state.number' never to be used
   handleChange = e => {
     this.setState({
       number: e.target.value
@@ -17,27 +16,14 @@ class Game extends Component {
   };
 
   numberClickHandler = (number) => {
-    const activeNumbers = this.state.activeNumbers;
-    const activeNumberIndex = activeNumbers.indexOf(number);
-
-    if (activeNumberIndex !== -1) {
-      activeNumbers.splice(activeNumberIndex, 1);
-    } else {
-      if (activeNumbers.length !== this.props.numbersPerTicket) {
-        activeNumbers.push(number);
-      }
-    }
-
     this.setState({
-      activeNumbers: activeNumbers
-    });
+      pressedNumber: number
+    })
   }
 
   buyTicket = () => {
-    this.props.buyTicket(this.state.activeNumbers);
-    this.setState({
-      activeNumbers: []
-    });
+    const ticketNumber = this.state.pressedNumber;
+    this.props.buyTicket(ticketNumber);
   };
 
   endGame = () => {
@@ -47,14 +33,13 @@ class Game extends Component {
   render() {
     return (
       <Segment textAlign='center'>
-        <p>Please choose {this.props.numbersPerTicket} {this.props.numbersPerTicket===1 ? "number" : "numbers"}.</p>
         <NumberGrid 
           minNumber={this.props.minNumber}
           maxNumber={this.props.maxNumber}
-          activeNumbers={this.state.activeNumbers}
+          activeNumber={this.state.pressedNumber}
           onClick={this.numberClickHandler}
           />
-        <Button secondary onClick={this.buyTicket} disabled={this.state.activeNumbers === [] || this.props.gameEnded}>Buy Ticket</Button>
+        <Button secondary onClick={this.buyTicket} disabled={this.state.pressedNumber === -1 || this.props.gameEnded}>Buy Ticket</Button>
         <Button secondary onClick={this.endGame} disabled={!this.props.numberDrawable}>End Game</Button>
       </Segment>
     );

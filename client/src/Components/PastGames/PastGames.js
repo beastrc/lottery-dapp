@@ -10,7 +10,7 @@ const pastGame = props => (
       <PastGame
         key={index}
         index={index}
-        luckyNumbers={game.luckyNumbers}
+        luckyNumber={game.luckyNumber}
         jackpot={game.jackpot}
         numberOfWinners={game.numberOfWinners}
         numberOfParticipants={game.numberOfParticipants}

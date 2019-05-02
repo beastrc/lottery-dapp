@@ -93,7 +93,6 @@ class History extends Component {
     const displayedGames = [];
     for (head; head >= tail; head--) {
       const game = await contract.methods.finishedGames(head).call();
-      game.luckyNumbers = await contract.methods.getLuckyNumbers(head).call();
       displayedGames.push(game);
     }
 
