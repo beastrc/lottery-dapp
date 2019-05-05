@@ -7,6 +7,7 @@ import LotteryContract from "../contracts/Lottery.json";
 import getWeb3 from "../utils/getWeb3";
 
 import { Grid, Pagination } from "semantic-ui-react";
+import { toast } from 'react-toastify';
 
 class History extends Component {
   _isMounted = false;
@@ -50,7 +51,7 @@ class History extends Component {
     } catch (error) {
       // catch any errors for any of the above operations
       console.error(error);
-      alert(
+      toast.error(
         "Failed to load web3, accounts, or contract. Check console for details."
       );
     }
@@ -149,23 +150,28 @@ class History extends Component {
         <Grid>
           <Grid.Row>
             <Grid.Column style={{ marginTop: "1rem" }}>
-              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-                <Pagination
-                  defaultActivePage={1}
-                  firstItem={null}
-                  lastItem={null}
-                  pointing
-                  secondary
-                  totalPages={this.state.numberOfPages}
-                  onPageChange={this.changePageClickHandler}
-                />
-              </div>
-              <PastGames 
-                games={this.state.displayedGames}
-                nrOfPastGames={this.state.nrOfPastGames}
-                getParticipants={this.getParticipantsClickHandler}
-                getWinners={this.getWinnersClickHandler}
-              />
+              {this.state.nrOfPastGames > 0
+                ? <div>
+                  <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                    <Pagination
+                      defaultActivePage={1}
+                      firstItem={null}
+                      lastItem={null}
+                      pointing
+                      secondary
+                      totalPages={this.state.numberOfPages}
+                      onPageChange={this.changePageClickHandler}
+                    />
+                  </div>
+                  <PastGames
+                    games={this.state.displayedGames}
+                    nrOfPastGames={this.state.nrOfPastGames}
+                    getParticipants={this.getParticipantsClickHandler}
+                    getWinners={this.getWinnersClickHandler}
+                  />
+                </div>
+                : <h5 style={{ textAlign: "center" }}>No games have been played yet</h5>
+              }
             </Grid.Column>
           </Grid.Row>
         </Grid>
